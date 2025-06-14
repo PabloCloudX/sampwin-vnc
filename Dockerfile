@@ -1,6 +1,7 @@
 FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV HOME=/home/container
 
 RUN dpkg --add-architecture i386 && \
     apt update && \
@@ -9,19 +10,18 @@ RUN dpkg --add-architecture i386 && \
     wget curl unzip zip p7zip-full \
     supervisor xvfb x11vnc fluxbox \
     xterm net-tools \
-    wine32 wine64 cabextract \
-    && apt clean
+    wine32 wine64 cabextract && \
+    apt clean
 
-RUN useradd -m -s /bin/bash sampuser
-RUN mkdir -p /home/sampuser/server /root/.vnc
-WORKDIR /home/sampuser/server
+# Pakai user container (default Pterodactyl)
+USER container
 
-RUN x11vnc -storepasswd 1235678 /root/.vnc/passwd
+WORKDIR /home/container
+
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-USER sampuser
 EXPOSE 7777 2000-2100 7000-7100 5900-5999
 
 CMD ["/entrypoint.sh"]
