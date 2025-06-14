@@ -8,12 +8,19 @@ sleep 2
 
 if [ "$TYPE" == "server" ]; then
     echo "[INFO] Menjalankan SA-MP Server..."
-    wine samp-server.exe
+    wine /home/container/samp-server.exe
+
 elif [ "$TYPE" == "pawno" ]; then
     echo "[INFO] Menjalankan Pawno Editor..."
-    x11vnc -display :0 -rfbport "$VNC_PORT" -usepw -forever &
-    wine pawno.exe
+    
+    mkdir -p /home/container/.vnc
+    x11vnc -storepasswd 1235678 /home/container/.vnc/passwd
+
+    x11vnc -display :0 -rfbauth /home/container/.vnc/passwd -rfbport "$VNC_PORT" -forever &
+
+    wine /home/container/pawno/pawno.exe
+
 else
-    echo "[INFO] Tidak ada TYPE valid."
+    echo "[INFO] TYPE tidak valid. Gunakan 'server' atau 'pawno'."
     sleep infinity
 fi
