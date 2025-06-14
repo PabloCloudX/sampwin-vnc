@@ -1,4 +1,7 @@
 #!/bin/bash
+
+export HOME=/home/container
+
 supervisord &
 
 sleep 2
@@ -11,6 +14,6 @@ elif [ "$TYPE" == "pawno" ]; then
     x11vnc -display :0 -rfbport "$VNC_PORT" -usepw -forever &
     wine pawno.exe
 else
-    echo "[INFO] Tidak ada TYPE valid. Gunakan 'server' atau 'pawno'."
+    echo "[INFO] Tidak ada TYPE valid."
     sleep infinity
 fi
