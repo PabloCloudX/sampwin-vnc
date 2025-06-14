@@ -2,26 +2,21 @@ FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV HOME=/home/container
+ENV DISPLAY=:1
 
-RUN dpkg --add-architecture i386 && \
-    apt update && \
-    apt install -y \
-    software-properties-common \
-    wget curl unzip zip p7zip-full \
-    supervisor xvfb x11vnc fluxbox \
-    xterm net-tools \
-    wine32 wine64 cabextract && \
-    apt clean
+RUN dpkg --add-architecture i386 && apt update && apt install -y \
+    wget curl unzip zip xterm net-tools supervisor \
+    fluxbox xvfb x11vnc wine32 wine64 cabextract \
+    && apt clean
 
 WORKDIR /home/container
+COPY . /home/container
 
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN chmod +x /home/container/entrypoint.sh
 
-# Gunakan UID 1000 (default user Pterodactyl)
+EXPOSE 7777 7000-7099
+
+# Pterodactyl non-root
 USER 1000:1000
 
-EXPOSE 7777 2000-2100 7000-7100 5900-5999
-
-CMD ["/entrypoint.sh"]
+CMD ["/home/container/entrypoint.sh"]
