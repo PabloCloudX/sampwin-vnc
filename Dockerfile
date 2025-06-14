@@ -17,4 +17,4 @@ EXPOSE 7777 2000-2100 5900-5999
 
 USER 1000:1000
 
-CMD ["bash entrypoint.sh"]
+CMD ["/home/container/entrypoint.sh"]
