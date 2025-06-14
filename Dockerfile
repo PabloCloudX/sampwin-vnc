@@ -18,12 +18,13 @@ VNC_PORT="${VNC_PORT:-5900}"\n\
 VNC_PASS="${VNC_PASS:-12345678}"\n\
 if [ "$TYPE" = "pawno" ]; then\n\
     echo "[INFO]: Start Pawno Editor"\n\
+    echo "[INFO]: VNC Berjalan Di Port $VNC_PORT"\n\
     mkdir -p /home/container/.vnc\n\
     x11vnc -storepasswd "$VNC_PASS" /home/container/.vnc/passwd >/dev/null 2>&1\n\
     Xvfb :1 -screen 0 1024x768x16 >/dev/null 2>&1 &\n\
     sleep 2\n\
     x11vnc -display :1 -rfbauth /home/container/.vnc/passwd -rfbport "$VNC_PORT" -forever -shared -noxdamage >/dev/null 2>&1 &\n\
-    /home/container/pawno/pawno.exe\n\
+    wine /home/container/pawno/pawno.exe\n\
 elif [ "$TYPE" = "samp" ]; then\n\
     echo "[INFO]: Start SA-MP Server"\n\
     wine /home/container/samp-server.exe\n\
@@ -32,14 +33,18 @@ else\n\
     sleep infinity\n\
 fi' > /entrypoint-template.sh && chmod +x /entrypoint-template.sh
 
-# Script untuk restore saat runtime
 RUN echo '#!/bin/bash\n\
 if [ ! -f /home/container/.pablo/entrypoint.sh ]; then\n\
-    echo "[INFO] File entrypoint.sh tidak ditemukan, membuat ulang..."\n\
+    echo "[INFO]: File entrypoint.sh tidak ditemukan, membuat ulang..."\n\
     mkdir -p /home/container/.pablo\n\
     cp /entrypoint-template.sh /home/container/.pablo/entrypoint.sh\n\
     chmod +x /home/container/.pablo/entrypoint.sh\n\
 fi\n\
+\n\
+# Set permission file utama jika ada\n\
+[ -f /home/container/pawno/pawno.exe ] && chmod 777 /home/container/pawno/pawno.exe\n\
+[ -f /home/container/samp-server.exe ] && chmod 777 /home/container/samp-server.exe\n\
+\n\
 exec bash /home/container/.pablo/entrypoint.sh' > /start.sh && chmod +x /start.sh
 
 WORKDIR /home/container
